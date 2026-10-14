@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Интерактивная визуальная новелла о подвиге Героя России гвардии майора Андрея Николаевича Ковтуна" />
+<meta name="theme-color" content="#0d0f12" />
+<title>Отечество моё Приморье — Подвиг Героя России Андрея Ковтуна</title>
+<style>
+:root {
+  --bg: #0d0f12;
+  --text: #e3e6eb;
+  --text-dim: #9aa4b2;
+  --accent: #0070f0;
+  --accent-soft: rgba(0, 112, 240, 0.18);
+  --accent-strong: #2b8bff;
+  --gold: #e8c46a;
+  --gold-soft: rgba(232, 196, 106, 0.18);
+  --line: rgba(255, 255, 255, 0.08);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  --font: "Inter", "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --maxw: 700px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at 50% 35%, #000 0%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at 50% 35%, #000 0%, transparent 78%);
+  z-index: 1;
+  opacity: 0.55;
+}
+.bg-layers {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  will-change: transform;
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.bg-layer {
+  position: absolute; inset: 0; opacity: 0;
+  transition: opacity 1.1s var(--ease), transform 1.4s var(--ease);
+  transform: scale(1.06);
+  will-change: transform;
+}
+.bg-layer[data-bg="peaceful"] { background: radial-gradient(1200px 700px at 50% -10%, rgba(0,112,240,0.20), transparent 62%), radial-gradient(900px 600px at 12% 110%, rgba(0,180,220,0.14), transparent 60%), linear-gradient(180deg, #0b1119 0%, #0d0f12 60%, #090b0f 100%); }
+.bg-layer[data-bg="alarm"] { background: radial-gradient(1200px 700px at 50% -10%, rgba(255,59,48,0.22), transparent 62%), radial-gradient(900px 600px at 15% 110%, rgba(255,59,48,0.16), transparent 60%), linear-gradient(180deg, #150a0b 0%, #0d0f12 60%, #090a0d 100%); }
+.bg-layer[data-bg="combat"] { background: radial-gradient(1100px 640px at 50% -10%, rgba(255,120,40,0.26), transparent 60%), radial-gradient(900px 600px at 85% 110%, rgba(255,59,48,0.22), transparent 60%), linear-gradient(180deg, #140b06 0%, #0b0c0f 60%, #08080a 100%); }
+.bg-layer[data-bg="climax"] { background: radial-gradient(1100px 640px at 50% -10%, rgba(255,59,48,0.30), transparent 60%), radial-gradient(900px 600px at 50% 120%, rgba(255,140,0,0.20), transparent 60%), linear-gradient(180deg, #120707 0%, #09090b 60%, #060607 100%); }
+.bg-layer[data-bg="final"] { background: radial-gradient(1100px 640px at 50% -10%, rgba(232,196,106,0.22), transparent 60%), radial-gradient(900px 600px at 50% 120%, rgba(232,196,106,0.14), transparent 60%), linear-gradient(180deg, #100f0a 0%, #0c0d10 60%, #08090b 100%); }
+body.peaceful .bg-layer[data-bg="peaceful"] { opacity: 1; transform: scale(1); }
+body.alarm .bg-layer[data-bg="alarm"] { opacity: 1; transform: scale(1); }
+body.combat .bg-layer[data-bg="combat"] { opacity: 1; transform: scale(1); }
+body.climax .bg-layer[data-bg="climax"] { opacity: 1; transform: scale(1); }
+body.final .bg-layer[data-bg="final"] { opacity: 1; transform: scale(1); }
+.vignette { position: fixed; inset: 0; pointer-events: none; z-index: 40; transition: box-shadow 0.7s var(--ease); }
+.scanlines { position: fixed; inset: 0; pointer-events: none; z-index: 41; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 3px); opacity: 0.5; mix-blend-mode: overlay; }
+.flash { position: fixed; inset: 0; pointer-events: none; z-index: 45; background: #fff; opacity: 0; mix-blend-mode: screen; }
+body.peaceful .vignette { box-shadow: inset 0 0 140px rgba(0,0,0,0.6); }
+body.alarm .vignette { box-shadow: inset 0 0 160px rgba(255,59,48,0.35); animation: alarmPulse 2.2s ease-in-out infinite; }
+body.combat .vignette { box-shadow: inset 0 0 200px rgba(255,59,48,0.5); animation: combatPulse 1.1s steps(2, end) infinite; }
+body.climax .vignette { box-shadow: inset 0 0 220px rgba(255,59,48,0.62); animation: climaxPulse 0.9s ease-in-out infinite; }
+body.final .vignette { box-shadow: inset 0 0 180px rgba(232,196,106,0.3); }
+@keyframes alarmPulse { 0%,100% { box-shadow: inset 0 0 120px rgba(255,59,48,0.2); } 50% { box-shadow: inset 0 0 190px rgba(255,59,48,0.45); } }
+@keyframes combatPulse { 0%,100% { box-shadow: inset 0 0 140px rgba(255,59,48,0.35); } 50% { box-shadow: inset 0 0 240px rgba(255,59,48,0.65); } }
+@keyframes climaxPulse { 0%,100% { box-shadow: inset 0 0 170px rgba(255,59,48,0.45); } 50% { box-shadow: inset 0 0 280px rgba(255,59,48,0.75); } }
+.topbar { position: sticky; top: 0; z-index: 30; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); background: rgba(13,15,18,0.72); border-bottom: 1px solid var(--line); }
+.topbar__inner { max-width: 1180px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand__mark { width: 34px; height: 34px; flex: 0 0 34px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), #0047a0); position: relative; box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 8px 22px rgba(0,112,240,0.28); }
+.brand__mark::after { content: ""; position: absolute; inset: 9px; border-radius: 3px; border: 2px solid rgba(255,255,255,0.85); border-bottom-color: transparent; border-right-color: transparent; transform: rotate(45deg); }
+.brand__text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.brand__text strong { font-size: 0.92rem; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand__text small { color: var(--text-dim); font-size: 0.72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.progress { width: min(400px, 44vw); display: flex; flex-direction: column; gap: 7px; flex: 1 1 auto; max-width: 420px; }
+.progress__meta { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }
+.progress__percent { font-family: var(--mono); color: var(--accent-strong); font-weight: 600; }
+.progress__track { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.07); overflow: hidden; border: 1px solid rgba(255,255,255,0.04); }
+.progress__fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, #0047a0, var(--accent-strong)); box-shadow: 0 0 18px rgba(0,112,240,0.55); transition: width 0.7s var(--ease); }
+.progress__dots {
+  list-style: none;
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+.dot { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 0.62rem; font-family: var(--mono); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); transition: all 0.35s var(--ease); }
+.dot.is-done { border-color: rgba(0,112,240,0.5); color: var(--accent-strong); background: var(--accent-soft); }
+.dot.is-active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 0 3px rgba(0,112,240,0.18); }
+.audio-controls { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.icon-btn { appearance: none; cursor: pointer; width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; color: var(--text-dim); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); transition: all 0.22s var(--ease); }
+.icon-btn:hover, .icon-btn:focus-visible { outline: none; color: var(--text); border-color: rgba(0,112,240,0.55); background: var(--accent-soft); }
+.icon-btn .icon--muted { display: none; }
+body.is-muted .icon-btn .icon--sound { display: none; }
+body.is-muted .icon-btn .icon--muted { display: block; }
+.stage { flex: 1 0 auto; position: relative; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 44px 20px 56px; }
+.scene {
+  width: 100%; max-width: var(--maxw);
+  background: linear-gradient(180deg, rgba(23,28,34,0.86), rgba(16,19,23,0.86));
+  border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 30px 30px 24px; position: relative; overflow: hidden;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  isolation: isolate;
+}
+.scene::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.7; }
+body.final .scene::before { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.scene__glass {
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.00) 30%, rgba(255,255,255,0.00) 70%, rgba(255,255,255,0.06) 100%);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease), background-position 0.9s var(--ease);
+  background-size: 220% 220%; background-position: 0% 0%;
+  mix-blend-mode: screen; z-index: 2;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35);
+}
+.scene:hover .scene__glass { opacity: 1; background-position: 100% 100%; }
+body.final .scene__glass {
+  background: linear-gradient(115deg, rgba(232,196,106,0.16) 0%, rgba(232,196,106,0.00) 40%, rgba(232,196,106,0.00) 60%, rgba(232,196,106,0.10) 100%);
+  background-size: 220% 220%; background-position: 0% 0%;
+}
+.scene__status { margin-bottom: 14px; position: relative; z-index: 3; }
+.status-badge { display: inline-block; font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--accent-strong); background: var(--accent-soft); border: 1px solid rgba(0,112,240,0.35); border-radius: 999px; padding: 5px 12px; }
+body.final .status-badge { color: var(--gold); border-color: rgba(232,196,106,0.4); background: var(--gold-soft); }
+.scene__title { margin: 0 0 16px; font-size: clamp(1.35rem, 3.4vw, 1.9rem); line-height: 1.25; color: #fff; position: relative; z-index: 3; }
+body.final .scene__title { color: var(--gold); }
+.scene__text { margin: 0 0 24px; font-size: clamp(1rem, 2.2vw, 1.12rem); color: var(--text); min-height: 7.5em; white-space: pre-wrap; word-break: break-word; position: relative; z-index: 3; }
+.caret { display: inline-block; width: 0.55ch; margin-left: 2px; background: var(--accent-strong); color: transparent; animation: caretBlink 0.9s steps(1, end) infinite; border-radius: 1px; }
+body.final .caret { background: var(--gold); }
+@keyframes caretBlink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+.scene__options { display: flex; flex-direction: column; gap: 11px; position: relative; z-index: 3; }
+.opt-btn { appearance: none; width: 100%; text-align: left; cursor: pointer; font: inherit; font-size: 0.97rem; line-height: 1.5; color: var(--text); background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015)); border: 1px solid rgba(255,255,255,0.12); border-left: 3px solid var(--accent); border-radius: var(--radius-sm); padding: 13px 16px; display: flex; align-items: center; gap: 12px; transition: transform 0.22s var(--ease), border-color 0.22s var(--ease), background 0.22s var(--ease), box-shadow 0.22s var(--ease), opacity 0.3s var(--ease); opacity: 0; transform: translateY(8px); animation: optIn 0.45s var(--ease) forwards; }
+.opt-btn:nth-child(1) { animation-delay: 0.05s; }
+.opt-btn:nth-child(2) { animation-delay: 0.13s; }
+.opt-btn__index { flex: 0 0 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; font-family: var(--mono); font-size: 0.72rem; font-weight: 700; color: var(--accent-strong); background: var(--accent-soft); border: 1px solid rgba(0,112,240,0.3); }
+.opt-btn__label { flex: 1 1 auto; }
+.opt-btn:hover, .opt-btn:focus-visible { outline: none; transform: translateX(4px); border-color: rgba(0,112,240,0.65); background: linear-gradient(180deg, rgba(0,112,240,0.16), rgba(0,112,240,0.05)); box-shadow: 0 0 0 3px rgba(0,112,240,0.14), 0 12px 30px rgba(0,112,240,0.10); }
+.opt-btn:hover .opt-btn__index, .opt-btn:focus-visible .opt-btn__index { background: var(--accent); color: #fff; }
+@keyframes optIn { to { opacity: 1; transform: translateY(0); } }
+.scene__footer { margin-top: 20px; padding-top: 16px; border-top: 1px dashed rgba(255,255,255,0.09); display: flex; justify-content: flex-end; position: relative; z-index: 3; }
+.ghost-btn { appearance: none; cursor: pointer; font: inherit; font-size: 0.78rem; letter-spacing: 0.04em; color: var(--text-dim); background: transparent; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; padding: 7px 14px; transition: all 0.22s var(--ease); }
+.ghost-btn:hover, .ghost-btn:focus-visible { outline: none; color: var(--text); border-color: rgba(0,112,240,0.55); background: var(--accent-soft); }
+.ghost-btn[hidden] { display: none; }
+.ghost-btn--gold { color: var(--gold); border-color: rgba(232,196,106,0.45); background: var(--gold-soft); }
+.ghost-btn--gold:hover, .ghost-btn--gold:focus-visible { color: #1a1405; background: var(--gold); border-color: var(--gold); }
+.scene.is-entering { animation: sceneFade 0.55s var(--ease); }
+@keyframes sceneFade { from { opacity: 0; transform: translateY(12px) scale(0.994); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.credits { width: 100%; max-width: var(--maxw); animation: sceneFade 0.7s var(--ease); }
+.credits[hidden] { display: none !important; }
+.credits[aria-hidden="true"] { display: none !important; }
+.credits__inner { background: linear-gradient(180deg, rgba(28,24,12,0.92), rgba(16,14,8,0.92)); border: 1px solid rgba(232,196,106,0.35); border-radius: var(--radius); box-shadow: 0 24px 70px rgba(0,0,0,0.6); padding: 34px 30px 28px; text-align: center; position: relative; overflow: hidden; }
+.credits__inner::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+
+.credits__portrait {
+  width: 180px;
+  height: 216px;
+  margin: 6px auto 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(232, 196, 106, 0.4);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  position: relative;
+  background: #0b0e13;
+}
+.credits__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  filter: contrast(1.04) saturate(0.96);
+}
+.credits__portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(232, 196, 106, 0.14), transparent 60%),
+    linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+  mix-blend-mode: screen;
+}
+
+.credits__title { margin: 0 0 4px; font-size: 0.78rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+.credits__name { margin: 0 0 22px; font-size: clamp(1.1rem, 2.6vw, 1.4rem); font-weight: 700; color: #fff; }
+.credits__awards { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.credits__awards li.award { perspective: 900px; padding: 0; background: transparent; border: 0; }
+.award__card { position: relative; display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: var(--radius-sm); background: linear-gradient(160deg, rgba(232,196,106,0.10), rgba(232,196,106,0.02)); border: 1px solid rgba(232,196,106,0.25); transform-style: preserve-3d; transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease); will-change: transform; overflow: hidden; }
+.award__card:hover { border-color: rgba(232,196,106,0.6); box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(232,196,106,0.18); }
+.award__glare { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(220px 160px at 20% 0%, rgba(255,255,255,0.22), transparent 60%); opacity: 0; transition: opacity 0.25s var(--ease); mix-blend-mode: screen; }
+.award__card:hover .award__glare { opacity: 1; }
+.award__medal--3d { position: relative; width: 44px; height: 44px; perspective: 500px; transform-style: preserve-3d; }
+.award__medal-face { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.20), rgba(0,0,0,0.25) 70%); border: 1px solid rgba(232,196,106,0.55); box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), inset 0 -2px 4px rgba(0,0,0,0.45); backface-visibility: hidden; transition: transform 0.35s var(--ease); }
+.award__medal-face--back { transform: rotateY(180deg); }
+.award__card:hover .award__medal-face--front { transform: rotateY(-180deg); }
+.award__card:hover .award__medal-face--back  { transform: rotateY(0deg); }
+.award__medal--3d::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 70%; height: 6px; transform: translateX(-50%); background: radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,0.55), transparent 70%); filter: blur(2px); pointer-events: none; }
+.award__text { display: flex; flex-direction: column; line-height: 1.35; }
+.award__text strong { color: #fff; font-size: 0.95rem; }
+.award__text em { font-style: normal; color: var(--text-dim); font-size: 0.78rem; }
+body.final .award__card { background: linear-gradient(160deg, rgba(232,196,106,0.18), rgba(232,196,106,0.04)); border-color: rgba(232,196,106,0.45); }
+.credits__epitaph { margin: 0 0 24px; font-style: italic; color: #f1e5c4; font-size: 1.02rem; }
+.credits__actions { display: flex; justify-content: center; }
+.footer { position: relative; z-index: 10; text-align: center; padding: 18px 20px 26px; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid var(--line); }
+.footer p { margin: 0; }
+
+.particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; will-change: transform; transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1); }
+.particles__ash, .particles__sparks { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s var(--ease); }
+body.combat .particles__ash,
+body.climax .particles__ash { opacity: 1; }
+body.peaceful .particles__sparks,
+body.final .particles__sparks { opacity: 1; }
+.particles__ash::before,
+.particles__ash::after {
+  content: "";
+  position: absolute; inset: -20% -10%;
+  background-image:
+    radial-gradient(2px 2px at 10% 90%, rgba(120,120,120,0.55), transparent 70%),
+    radial-gradient(1.6px 1.6px at 22% 78%, rgba(90,90,90,0.5), transparent 70%),
+    radial-gradient(2.2px 2.2px at 35% 95%, rgba(140,140,140,0.42), transparent 70%),
+    radial-gradient(1.8px 1.8px at 48% 82%, rgba(110,110,110,0.5), transparent 70%),
+    radial-gradient(2px 2px at 60% 96%, rgba(160,160,160,0.4), transparent 70%),
+    radial-gradient(1.6px 1.6px at 72% 80%, rgba(100,100,100,0.48), transparent 70%),
+    radial-gradient(2.4px 2.4px at 84% 92%, rgba(130,130,130,0.4), transparent 70%),
+    radial-gradient(1.8px 1.8px at 94% 84%, rgba(90,90,90,0.45), transparent 70%);
+  animation: ashRise 26s linear infinite;
+}
+.particles__ash::after { background-size: 60% 60%; filter: blur(0.6px); animation-duration: 38s; animation-direction: reverse; opacity: 0.6; }
+@keyframes ashRise { from { transform: translate3d(0, 12%, 0) rotate(0.001deg); } to { transform: translate3d(-4%, -18%, 0) rotate(0.001deg); } }
+.particles__sparks::before,
+.particles__sparks::after {
+  content: "";
+  position: absolute; inset: -15% -10%;
+  background-image:
+    radial-gradient(2px 2px at 12% 70%, rgba(0,180,255,0.75), transparent 70%),
+    radial-gradient(1.6px 1.6px at 28% 55%, rgba(120,210,255,0.6), transparent 70%),
+    radial-gradient(2.2px 2.2px at 44% 78%, rgba(0,140,255,0.5), transparent 70%),
+    radial-gradient(1.8px 1.8px at 58% 48%, rgba(160,220,255,0.6), transparent 70%),
+    radial-gradient(2px 2px at 72% 72%, rgba(0,180,255,0.55), transparent 70%),
+    radial-gradient(1.6px 1.6px at 86% 60%, rgba(120,210,255,0.5), transparent 70%);
+  animation: sparkDrift 22s ease-in-out infinite;
+}
+.particles__sparks::after { background-size: 70% 70%; filter: blur(0.4px); animation-duration: 34s; animation-direction: reverse; opacity: 0.7; }
+@keyframes sparkDrift { 0% { transform: translate3d(0, 6%, 0); } 50% { transform: translate3d(2%, -4%, 0); } 100% { transform: translate3d(0, 6%, 0); } }
+
+@media (max-width: 960px) {
+  .topbar__inner { flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
+  .progress { order: 3; width: 100%; max-width: none; }
+  .brand__text small { display: none; }
+}
+@media (max-width: 560px) {
+  body { font-size: 15px; }
+  .stage { padding: 24px 12px 40px; align-items: flex-start; }
+  .scene, .credits__inner { padding: 22px 18px; border-radius: 12px; }
+  .scene__text { min-height: 9em; }
+  .progress__dots { justify-content: space-between; }
+  .dot { width: 24px; height: 24px; }
+  .opt-btn { padding: 12px 13px; font-size: 0.93rem; }
+  .brand__mark { width: 30px; height: 30px; flex-basis: 30px; }
+  .credits__portrait { width: 150px; height: 180px; }
+  .award__medal--3d { width: 38px; height: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  .caret { display: none; }
+  .particles__ash::before, .particles__ash::after,
+  .particles__sparks::before, .particles__sparks::after { animation: none !important; }
+  .bg-layers, .particles { transition: none !important; }
+}
+</style>
+</head>
+<body class="peaceful">
+<div class="bg-layers" aria-hidden="true">
+  <div class="bg-layer" data-bg="peaceful"></div>
+  <div class="bg-layer" data-bg="alarm"></div>
+  <div class="bg-layer" data-bg="combat"></div>
+  <div class="bg-layer" data-bg="climax"></div>
+  <div class="bg-layer" data-bg="final"></div>
+</div>
+<div class="particles" aria-hidden="true">
+  <div class="particles__ash"></div>
+  <div class="particles__sparks"></div>
+</div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+<div class="flash" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__text">
+        <strong>Отечество моё Приморье</strong>
+        <small>Герой России гвардии майор Андрей Николаевич Ковтун</small>
+      </span>
+    </div>
+    <div class="progress" role="group" aria-label="Прогресс прохождения">
+      <div class="progress__meta">
+        <span id="chapterLabel">Глава 1 из 5</span>
+        <span id="progressPercent" class="progress__percent">0%</span>
+      </div>
+      <div class="progress__track">
+        <div id="progressBar" class="progress__fill" style="width: 0%"></div>
+      </div>
+      <ol id="chapterDots" class="progress__dots">
+        <li class="dot is-active" data-chapter="1"><span>1</span></li>
+        <li class="dot" data-chapter="2"><span>2</span></li>
+        <li class="dot" data-chapter="3"><span>3</span></li>
+        <li class="dot" data-chapter="4"><span>4</span></li>
+        <li class="dot" data-chapter="5"><span>5</span></li>
+      </ol>
+    </div>
+    <div class="audio-controls">
+      <button id="muteBtn" class="icon-btn" type="button" aria-pressed="false" title="Звук: включён" aria-label="Переключить звук">
+        <svg class="icon icon--sound" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+          <path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon icon--muted" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+          <path d="M16 9l5 5M21 9l-5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="stage">
+  <section class="scene" id="scene" aria-live="polite">
+    <div class="scene__glass" aria-hidden="true"></div>
+    <div class="scene__status">
+      <span class="status-badge" id="statusBadge">Мирное время</span>
+    </div>
+    <h1 class="scene__title" id="sceneTitle">Глава 1: Истоки</h1>
+    <p class="scene__text" id="sceneText"></p>
+    <div class="scene__options" id="options" role="group" aria-label="Варианты действий"></div>
+    <div class="scene__footer">
+      <button class="ghost-btn" id="skipBtn" type="button" title="Показать текст полностью (Esc)">Показать текст полностью</button>
+    </div>
+  </section>
+
+  <section class="credits" id="credits" hidden aria-hidden="true" aria-label="Финальные титры">
+    <div class="credits__inner">
+      <div class="credits__portrait">
+        <img src="kovtun.webp" alt="Герой России гвардии майор Андрей Николаевич Ковтун" />
+      </div>
+      <h2 class="credits__title">Герой Российской Федерации</h2>
+      <p class="credits__name">гвардии майор Ковтун Андрей Николаевич</p>
+      <ul class="credits__awards">
+        <li class="award tilt" data-tilt>
+          <div class="award__card">
+            <div class="award__glare" aria-hidden="true"></div>
+            <span class="award__medal award__medal--3d" aria-hidden="true">
+              <span class="award__medal-face award__medal-face--front">
+                <svg viewBox="0 0 40 40" width="30" height="30">
+                  <polygon points="20,3 24,14 36,14 26,22 30,34 20,26 10,34 14,22 4,14 16,14" fill="#e8c46a" stroke="#a87c1f" stroke-width="1"/>
+                </svg>
+              </span>
+              <span class="award__medal-face award__medal-face--back">
+                <svg viewBox="0 0 40 40" width="30" height="30">
+                  <polygon points="20,37 16,26 4,26 14,18 10,6 20,14 30,6 26,18 36,26 24,26" fill="#c79b3a" stroke="#8a6512" stroke-width="1"/>
+                </svg>
+              </span>
+            </span>
+            <span class="award__text"><strong>Звание Героя России</strong><em>посмертно, 2022 год</em></span>
+          </div>
+        </li>
+
+        <li class="award tilt" data-tilt>
+          <div class="award__card">
+            <div class="award__glare" aria-hidden="true"></div>
+            <span class="award__medal award__medal--3d" aria-hidden="true">
+              <span class="award__medal-face award__medal-face--front">
+                <svg viewBox="0 0 40 40" width="30" height="30">
+                  <circle cx="20" cy="20" r="16" fill="#c0392b" stroke="#e8c46a" stroke-width="2"/>
+                  <path d="M12 20l6 6 12-14" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="award__medal-face award__medal-face--back">
+                <svg viewBox="0 0 40 40" width="30" height="30">
+                  <circle cx="20" cy="20" r="16" fill="#8a2318" stroke="#c79b3a" stroke-width="2"/>
+                  <path d="M20 10v20M10 20h20" stroke="#e8c46a" stroke-width="1.6"/>
+                </svg>
+              </span>
+            </span>
+            <span class="award__text"><strong>Орден Мужества</strong><em>за образцовое исполнение долга</em></span>
+          </div>
+        </li>
+
+        <li class="award tilt" data-tilt>
+          <div class="award__card">
+            <div class="award__glare" aria-hidden="true"></div>
+            <span class="award__medal award__medal--3d" aria-hidden="true">
+              <span class="award__medal-face award__medal-face--front">
+                <svg viewBox="0 0 40 40" width="30" height="30">
+                  <rect x="6" y="8" width="28" height="24" rx="3" fill="#0070f0" stroke="#e8c46a" stroke-width="2"/>
+                  <path d="M12 20h16M12 25h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="award__medal-face award__medal-face--back">
+                <svg viewBox="0 0 40 40" width="30" height="30">
+                  <rect x="6" y="8" width="28" height="24" rx="3" fill="#0047a0" stroke="#c79b3a" stroke-width="2"/>
+                  <path d="M20 13v14M13 20h14" stroke="#e8c46a" stroke-width="1.6"/>
+                </svg>
+              </span>
+            </span>
+            <span class="award__text"><strong>Память в Приморье</strong><em>улицы, Парты Героя, уроки мужества</em></span>
+          </div>
+        </li>
+      </ul>
+      <p class="credits__epitaph">«Ни один его солдат не остался брошен. Он спас их всех.»</p>
+      <div class="credits__actions">
+        <button class="ghost-btn ghost-btn--gold" id="replayBtn" type="button">Пройти историю заново</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>Проект посвящён подвигу Героя Российской Федерации гвардии майора А. Н. Ковтуна.</p>
+</footer>
+
+<script>
+"use strict";
+
+const CHAPTERS = {
+  1: { title: "Глава 1: Истоки", status: "peaceful", label: "Мирное время" },
+  2: { title: "Глава 2: Сигнал о помощи", status: "alarm", label: "Тревога" },
+  3: { title: "Глава 3: Контрудар", status: "combat", label: "Бой" },
+  4: { title: "Глава 4: Высший подвиг", status: "climax", label: "Кульминация" },
+  5: { title: "Глава 5: Бессмертие", status: "final", label: "Бессмертие" }
+};
+
+const STORY = [
+  { id: 1, chapter: 1, status: "peaceful",
+    text: "Приморский край. Земля бескрайней тайги, суровых скал и Тихого океана. Здесь, на Дальнем Востоке, ковался характер будущих защитников Родины. Андрей Ковтун с детства знал, что такое офицерская честь. Перед ним стоял выбор: выбрать спокойную гражданскую профессию или связать жизнь с армией, продолжив династию воинов.",
+    options: [
+      { text: "Поступить в военное училище и посвятить себя защите Отечества", nextId: 2 },
+      { text: "Выбрать гражданскую специальность", nextId: 101 }
+    ] },
+  { id: 101, chapter: 1, status: "peaceful",
+    text: "Сердце и долг всё равно подсказывали Андрею другой путь. Пройдет время, и он осознает, что его истинное призвание — быть командиром и защищать людей. Он принимает решение надеть погоны.",
+    options: [ { text: "Принять присягу и возглавить роту", nextId: 2 } ] },
+  { id: 2, chapter: 1, status: "peaceful",
+    text: "Годы учебы позади. Андрей Ковтун — гвардии майор, командир мотострелковой роты. Наступает 2022 год. Началась Специальная военная операция. Рота Ковтуна выдвигается на передовую. Андрей понимает: теперь он отвечает за жизнь каждого своего солдата.",
+    options: [ { text: "Вступить в командование на передовой", nextId: 3 } ] },
+  { id: 3, chapter: 2, status: "alarm",
+    text: "10 августа 2022 года. Сектор боевых действий. Ваша рота находится в резерве, обеспечивая охрану рубежа. Вдруг радиостанция взрывается треском и криками. Сквозь помехи пробивается голос: «Внимание всем! Группа разведчиков попала в засаду в районе лесополосы! Ведем тяжелый бой, много раненых, боекомплект на исходе! Нужна помощь!»",
+    options: [
+      { text: "Запросить штаб и ждать приказов сверху", nextId: 301 },
+      { text: "Приказать роте немедленно выдвигаться на выручку", nextId: 4 }
+    ] },
+  { id: 301, chapter: 2, status: "alarm",
+    text: "Штаб молчит из-за глушения связи врагом. Каждая секунда промедления стоит жизни разведгруппе. Андрей понимает, что решение нужно принимать самому. Прямо сейчас.",
+    options: [ { text: "Отдать приказ: «Рота, к бою! Вперед!»", nextId: 4 } ] },
+  { id: 4, chapter: 3, status: "combat",
+    text: "Рота майора Ковтуна на полной скорости вклинивается в район боя. Перед глазами страшная картина: превосходящие силы противника зажали наших разведчиков в полукольцо. Огонь ведется со всех сторон. Андрей мгновенно оценивает тактическую обстановку. Нужно действовать решительно, чтобы спасти парней.",
+    options: [
+      { text: "Организовать плотный встречный огонь и подавить огневые точки противника", nextId: 5 },
+      { text: "Пойти напролом в лобовую атаку", nextId: 401 }
+    ] },
+  { id: 401, chapter: 3, status: "combat",
+    text: "Лобовая атака слишком опасна, Андрей корректирует план на ходу: бойцы роты рассредотачиваются и открывают шквальный прикрывающий огонь, заставляя врага пригнуть головы.",
+    options: [ { text: "Продолжать операцию спасения", nextId: 5 } ] },
+  { id: 5, chapter: 3, status: "combat",
+    text: "Встречный огонь роты Ковтуна срабатывает! Враг вынужден переключить внимание. Андрей лично координирует действия бойцов. Создан узкий коридор для эвакуации. «Раненых назад! Выводите разведчиков!» — командует майор. Но противник подтягивает резервы. Коридор начинает сужаться.",
+    options: [ { text: "Приказать роте отходить вместе с ранеными, оставшись прикрывать их лично", nextId: 6 } ] },
+  { id: 6, chapter: 4, status: "climax",
+    text: "Разведчики и раненые бойцы роты начинают отход. Но враг яростно пытается замкнуть кольцо. Андрей Ковтун принимает свое главное, роковое решение. Он остается на огневой позиции вместе с несколькими бойцами. Огонь противника полностью сосредоточен на нем. Андрей стреляет до последнего патрона, давая товарищам драгоценные минуты.",
+    options: [ { text: "Принять неравный бой и держать оборону до конца", nextId: 7 } ] },
+  { id: 7, chapter: 4, status: "climax",
+    text: "Боекомплект исчерпан. Андрей Ковтун получает тяжелые осколочные и пулевые ранения. Но его задача выполнена: вся группа разведчиков и раненые бойцы роты успешно вышли из окружения. Ни один его солдат не остался брошен. Андрей Ковтун закрывает глаза. Он спас их всех.",
+    options: [ { text: "Узнать о бессмертии Героя", nextId: 8 } ] },
+  { id: 8, chapter: 5, status: "final",
+    text: "За мужество, героизм и отвагу, проявленные при исполнении воинского долга, гвардии майору Ковтуну Андрею Николаевичу посмертно присвоено звание Героя Российской Федерации. Его имя навсегда занесено в списки воинской славы Отечества. Память о нем живет в Приморье: в его честь называют улицы, открывают Парты Героя в школах, а его подвиг изучают новые поколения дальневосточников.",
+    options: [ { text: "Перейти к финальным титрам", nextId: 9 } ] },
+  { id: 9, chapter: 5, status: "final",
+    text: "Память о Герое России гвардии майоре Андрее Николаевиче Ковтуне — бессмертна. Он навсегда останется в строю.",
+    options: [ { text: "Пройти историю заново", nextId: 1 } ],
+    credits: true }
+];
+
+const bodyEl = document.body;
+const sceneEl = document.getElementById("scene");
+const sceneTitleEl = document.getElementById("sceneTitle");
+const sceneTextEl = document.getElementById("sceneText");
+const optionsEl = document.getElementById("options");
+const statusBadgeEl = document.getElementById("statusBadge");
+const chapterLabelEl = document.getElementById("chapterLabel");
+const progressBarEl = document.getElementById("progressBar");
+const progressPercentEl = document.getElementById("progressPercent");
+const chapterDotsEl = document.getElementById("chapterDots");
+const skipBtn = document.getElementById("skipBtn");
+const flashEl = document.querySelector(".flash");
+const creditsEl = document.getElementById("credits");
+const replayBtn = document.getElementById("replayBtn");
+const muteBtn = document.getElementById("muteBtn");
+
+let currentScene = null;
+let printTimer = null;
+let isPrinting = false;
+let activeOptions = [];
+let currentId = 1;
+let fullText = "";
+const typeSpeed = 18;
+
+function getSceneById(id) { return STORY.find((s) => s.id === id) || null; }
+
+function clearTyping() {
+  if (printTimer) { clearTimeout(printTimer); printTimer = null; }
+  isPrinting = false;
+}
+
+function applyTheme(status) {
+  ["peaceful","alarm","combat","climax","final"].forEach((t) => bodyEl.classList.remove(t));
+  bodyEl.classList.add(status);
+  Audio.setTheme(status);
+}
+
+function updateProgress(chapter) {
+  const total = 5;
+  const c = Math.max(1, Math.min(total, chapter));
+  const percent = Math.round((c / total) * 100);
+  chapterLabelEl.textContent = "Глава " + c + " из " + total;
+  progressPercentEl.textContent = percent + "%";
+  progressBarEl.style.width = percent + "%";
+  chapterDotsEl.querySelectorAll(".dot").forEach((dot) => {
+    const num = Number(dot.dataset.chapter);
+    dot.classList.toggle("is-active", num === c);
+    dot.classList.toggle("is-done", num < c);
+  });
+}
+
+function typeText(text, onDone) {
+  clearTyping();
+  fullText = text;
+  isPrinting = true;
+  sceneTextEl.textContent = "";
+  skipBtn.hidden = false;
+  const caret = document.createElement("span");
+  caret.className = "caret";
+  caret.textContent = " ";
+  sceneTextEl.appendChild(caret);
+  let i = 0;
+  const step = () => {
+    if (i >= fullText.length) { finishTyping(); if (onDone) onDone(); return; }
+    const ch = fullText[i++];
+    caret.insertAdjacentText("beforebegin", ch);
+    Audio.typeTick(ch);
+    let delay = typeSpeed;
+    if (ch === ",") delay += 40;
+    else if ("!?:.—".includes(ch)) delay += 90;
+    else if (ch === " ") delay += 4;
+    printTimer = setTimeout(step, delay);
+  };
+  printTimer = setTimeout(step, 160);
+}
+
+function finishTyping() {
+  clearTyping();
+  sceneTextEl.textContent = fullText;
+  skipBtn.hidden = true;
+}
+
+function renderOptions(options, hidden) {
+  optionsEl.innerHTML = "";
+  activeOptions = [];
+  if (!Array.isArray(options)) return;
+  options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "opt-btn";
+    btn.dataset.nextId = String(opt.nextId);
+    if (hidden) { btn.style.opacity = "0"; btn.style.pointerEvents = "none"; }
+    const idx = document.createElement("span");
+    idx.className = "opt-btn__index";
+    idx.textContent = String(i + 1).padStart(2, "0");
+    const lbl = document.createElement("span");
+    lbl.className = "opt-btn__label";
+    lbl.textContent = opt.text;
+    btn.appendChild(idx);
+    btn.appendChild(lbl);
+    btn.addEventListener("click", () => {
+      if (isPrinting) finishTyping();
+      Audio.click();
+      renderScene(Number(btn.dataset.nextId));
+    });
+    optionsEl.appendChild(btn);
+    activeOptions.push(btn);
+  });
+}
+
+function showOptions() {
+  activeOptions.forEach((b) => {
+    b.style.opacity = "";
+    b.style.pointerEvents = "";
+  });
+}
+
+function triggerFlash(delay) {
+  const run = () => {
+    flashEl.style.transition = "none";
+    flashEl.style.opacity = "0.85";
+    void flashEl.offsetWidth;
+    flashEl.style.transition = "opacity 0.35s ease-out";
+    flashEl.style.opacity = "0";
+  };
+  if (delay) setTimeout(run, delay); else run();
+}
+
+function hideCredits() {
+  creditsEl.hidden = true;
+  creditsEl.setAttribute("aria-hidden", "true");
+  creditsEl.style.display = "none";
+}
+
+function showCreditsBlock() {
+  creditsEl.hidden = false;
+  creditsEl.setAttribute("aria-hidden", "false");
+  creditsEl.style.display = "block";
+  creditsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderScene(id) {
+  const scene = getSceneById(id);
+  if (!scene) return;
+  currentId = id;
+  currentScene = scene;
+
+  const meta = CHAPTERS[scene.chapter] || CHAPTERS[1];
+  applyTheme(scene.status);
+  updateProgress(scene.chapter);
+  sceneTitleEl.textContent = meta.title;
+  statusBadgeEl.textContent = meta.label;
+  optionsEl.innerHTML = "";
+  activeOptions = [];
+
+  sceneEl.hidden = false;
+  sceneEl.style.display = "block";
+
+  hideCredits();
+
+  sceneEl.classList.remove("is-entering");
+  void sceneEl.offsetWidth;
+  sceneEl.classList.add("is-entering");
+
+  if (scene.status === "combat" || scene.status === "climax") {
+    triggerFlash();
+    Audio.burst();
+  }
+
+  typeText(scene.text, () => {
+    showOptions();
+    if (scene.credits) {
+      setTimeout(showCreditsBlock, 600);
+    }
+  });
+
+  renderOptions(scene.options, true);
+}
+
+const Audio = (() => {
+  let ctx = null, masterGain = null, muted = false, currentTheme = "peaceful";
+  let ambientOsc = null, ambientGain = null, lfoOsc = null;
+  let noiseSrc = null, noiseGain = null, noiseFilter = null;
+
+  const themes = {
+    peaceful: { base: 110, noise: 0.04, filter: 700, lfo: 0.12, gain: 0.05 },
+    alarm:    { base: 98,  noise: 0.07, filter: 900, lfo: 0.55, gain: 0.06 },
+    combat:   { base: 82,  noise: 0.12, filter: 600, lfo: 0.9,  gain: 0.07 },
+    climax:   { base: 73,  noise: 0.14, filter: 500, lfo: 0.7,  gain: 0.08 },
+    final:    { base: 130, noise: 0.03, filter: 1200, lfo: 0.18, gain: 0.055 }
+  };
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = muted ? 0 : 0.9;
+    masterGain.connect(ctx.destination);
+    return ctx;
+  }
+
+  function noiseBuffer() {
+    const len = ctx.sampleRate * 2;
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.6;
+    return buf;
+  }
+
+  function stopAmbient() {
+    try { if (ambientOsc) ambientOsc.stop(); } catch (e) {}
+    try { if (lfoOsc) lfoOsc.stop(); } catch (e) {}
+    try { if (noiseSrc) noiseSrc.stop(); } catch (e) {}
+    ambientOsc = ambientGain = lfoOsc = noiseSrc = noiseGain = noiseFilter = null;
+  }
+
+  function startAmbient() {
+    if (!ctx) return;
+    stopAmbient();
+    const cfg = themes[currentTheme];
+    ambientOsc = ctx.createOscillator();
+    ambientOsc.type = "sine";
+    ambientOsc.frequency.value = cfg.base;
+    ambientGain = ctx.createGain();
+    ambientGain.gain.value = 0;
+    ambientOsc.connect(ambientGain);
+    ambientGain.connect(masterGain);
+    lfoOsc = ctx.createOscillator();
+    lfoOsc.type = "sine";
+    lfoOsc.frequency.value = cfg.lfo;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 3;
+    lfoOsc.connect(lfoGain);
+    lfoGain.connect(ambientOsc.frequency);
+    noiseSrc = ctx.createBufferSource();
+    noiseSrc.buffer = noiseBuffer();
+    noiseSrc.loop = true;
+    noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = "bandpass";
+    noiseFilter.frequency.value = cfg.filter;
+    noiseFilter.Q.value = 0.7;
+    noiseGain = ctx.createGain();
+    noiseGain.gain.value = 0;
+    noiseSrc.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(masterGain);
+    ambientOsc.start(); lfoOsc.start(); noiseSrc.start();
+    const t = ctx.currentTime;
+    ambientGain.gain.linearRampToValueAtTime(cfg.gain, t + 1.2);
+    noiseGain.gain.linearRampToValueAtTime(cfg.noise, t + 1.2);
+  }
+
+  function setTheme(status) {
+    if (!themes[status]) return;
+    currentTheme = status;
+    if (!ctx) return;
+    if (!ambientOsc) startAmbient();
+    else {
+      const cfg = themes[status];
+      const t = ctx.currentTime;
+      ambientGain.gain.cancelScheduledValues(t);
+      ambientGain.gain.linearRampToValueAtTime(cfg.gain, t + 1.2);
+      noiseGain.gain.cancelScheduledValues(t);
+      noiseGain.gain.linearRampToValueAtTime(cfg.noise, t + 1.2);
+      noiseFilter.frequency.cancelScheduledValues(t);
+      noiseFilter.frequency.linearRampToValueAtTime(cfg.filter, t + 1.2);
+      ambientOsc.frequency.cancelScheduledValues(t);
+      ambientOsc.frequency.linearRampToValueAtTime(cfg.base, t + 1.2);
+      lfoOsc.frequency.cancelScheduledValues(t);
+      lfoOsc.frequency.linearRampToValueAtTime(cfg.lfo, t + 1.2);
+    }
+  }
+
+  function burst() {
+    if (!ensure() || muted) return;
+    if (ctx.state === "suspended") ctx.resume();
+    const t = ctx.currentTime;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer();
+    const f = ctx.createBiquadFilter();
+    f.type = "lowpass";
+    f.frequency.setValueAtTime(1800, t);
+    f.frequency.exponentialRampToValueAtTime(120, t + 0.35);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.5, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+    noise.connect(f); f.connect(g); g.connect(masterGain);
+    noise.start(t); noise.stop(t + 0.5);
+    const boom = ctx.createOscillator();
+    boom.type = "sine";
+    boom.frequency.setValueAtTime(120, t);
+    boom.frequency.exponentialRampToValueAtTime(40, t + 0.4);
+    const bg = ctx.createGain();
+    bg.gain.setValueAtTime(0.0001, t);
+    bg.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+    bg.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+    boom.connect(bg); bg.connect(masterGain);
+    boom.start(t); boom.stop(t + 0.55);
+  }
+
+  function click() {
+    if (!ensure() || muted) return;
+    if (ctx.state === "suspended") ctx.resume();
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = "triangle";
+    o.frequency.setValueAtTime(880, t);
+    o.frequency.exponentialRampToValueAtTime(420, t + 0.08);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.12, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    o.connect(g); g.connect(masterGain);
+    o.start(t); o.stop(t + 0.14);
+  }
+
+  function typeTick(ch) {
+    if (!ensure() || muted) return;
+    if (ctx.state === "suspended") ctx.resume();
+    if (ch === " " || ch === "\n") return;
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = "square";
+    o.frequency.value = 1600 + Math.random() * 500;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.02, t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+    o.connect(g); g.connect(masterGain);
+    o.start(t); o.stop(t + 0.035);
+  }
+
+  function toggleMute() {
+    muted = !muted;
+    if (!ctx) { ensure(); startAmbient(); }
+    if (ctx.state === "suspended") ctx.resume();
+    const t = ctx.currentTime;
+    masterGain.gain.cancelScheduledValues(t);
+    masterGain.gain.linearRampToValueAtTime(muted ? 0 : 0.9, t + 0.2);
+    return muted;
+  }
+
+  function unlock() {
+    ensure();
+    if (ctx && ctx.state === "suspended") ctx.resume();
+    if (!ambientOsc) startAmbient();
+  }
+
+  return { setTheme, burst, click, typeTick, toggleMute, unlock };
+})();
+
+let audioStarted = false;
+function startAudioOnce() {
+  if (audioStarted) return;
+  audioStarted = true;
+  Audio.unlock();
+  const sc = getSceneById(currentId);
+  Audio.setTheme(sc ? sc.status : "peaceful");
+}
+["click","keydown","touchstart"].forEach((e) =>
+  window.addEventListener(e, startAudioOnce, { once: true, passive: true })
+);
+
+if (muteBtn) {
+  muteBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    startAudioOnce();
+    const m = Audio.toggleMute();
+    bodyEl.classList.toggle("is-muted", m);
+    muteBtn.setAttribute("aria-pressed", String(m));
+    muteBtn.title = m ? "Звук: выключен" : "Звук: включён";
+  });
+}
+
+skipBtn.addEventListener("click", () => {
+  if (isPrinting) { finishTyping(); showOptions(); }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (isPrinting) { finishTyping(); showOptions(); }
+    return;
+  }
+  const n = Number(e.key);
+  if (n >= 1 && n <= 9) {
+    const b = activeOptions[n - 1];
+    if (b && b.style.pointerEvents !== "none") b.click();
+  }
+});
+
+if (replayBtn) {
+  replayBtn.addEventListener("click", () => {
+    Audio.click();
+    hideCredits();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    renderScene(1);
+  });
+}
+
+/* =========================================================
+   ПАРАЛЛАКС МЫШИ
+   ========================================================= */
+(function initParallax() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const bgLayers = document.querySelector(".bg-layers");
+  const particles = document.querySelector(".particles");
+  const scene = document.getElementById("scene");
+  if (!bgLayers) return;
+
+  const target = { x: 0, y: 0 };
+  const current = { x: 0, y: 0 };
+  let raf = null;
+  let active = false;
+
+  function onMove(e) {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    target.x = (e.clientX / w) * 2 - 1;
+    target.y = (e.clientY / h) * 2 - 1;
+    if (!active) { active = true; raf = requestAnimationFrame(tick); }
+  }
+
+  function tick() {
+    current.x += (target.x - current.x) * 0.08;
+    current.y += (target.y - current.y) * 0.08;
+
+    const tx = -current.x * 14;
+    const ty = -current.y * 10;
+
+    bgLayers.style.transform = "translate3d(" + tx.toFixed(2) + "px," + ty.toFixed(2) + "px,0)";
+    if (particles) {
+      particles.style.transform = "translate3d(" + (tx * 0.6).toFixed(2) + "px," + (ty * 0.6).toFixed(2) + "px,0)";
+    }
+    if (scene) {
+      scene.style.setProperty("--px", current.x.toFixed(3));
+      scene.style.setProperty("--py", current.y.toFixed(3));
+    }
+
+    if (Math.abs(target.x - current.x) > 0.001 || Math.abs(target.y - current.y) > 0.001) {
+      raf = requestAnimationFrame(tick);
+    } else {
+      active = false;
+    }
+  }
+
+  window.addEventListener("mousemove", onMove, { passive: true });
+  window.addEventListener("mouseleave", () => {
+    target.x = 0; target.y = 0;
+    if (!active) { active = true; raf = requestAnimationFrame(tick); }
+  });
+})();
+
+/* =========================================================
+   TILT ДЛЯ 3D-МЕДАЛЕЙ
+   ========================================================= */
+(function initTilt() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  function bindTilt(el) {
+    if (el.dataset.tiltBound === "1") return;
+    el.dataset.tiltBound = "1";
+
+    const card = el.querySelector(".award__card") || el;
+    const glare = el.querySelector(".award__glare");
+
+    function onMove(e) {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      const rx = (0.5 - y) * 14;
+      const ry = (x - 0.5) * 18;
+      card.style.transform = "rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg) translateZ(2px)";
+      if (glare) {
+        glare.style.background = "radial-gradient(240px 180px at " +
+          (x * 100).toFixed(1) + "% " + (y * 100).toFixed(1) +
+          "%, rgba(255,255,255,0.28), transparent 60%)";
+      }
+    }
+
+    function onLeave() { card.style.transform = ""; }
+
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+  }
+
+  function bindAll() {
+    document.querySelectorAll("[data-tilt]").forEach(bindTilt);
+  }
+
+  bindAll();
+  const observer = new MutationObserver(bindAll);
+  observer.observe(document.body, { childList: true, subtree: true });
+})();
+
+hideCredits();
+renderScene(1);
+</script>
+</body>
+</html>
